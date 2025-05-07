@@ -6,7 +6,7 @@ public class Article
     public string Category { get; set; } = string.Empty;
     public string Status { get; set; } = "Draft";
     public int AuthorId { get; set; }
-    public User Author { get; set; } = null!;  // null! tells compiler we'll initialize it
+    public User Author { get; set; } = null!;  
     public DateTime? SubmittedDate { get; set; }
     public string? FeaturedImageUrl { get; set; }
     public List<string> Tags { get; set; } = new List<string>();
