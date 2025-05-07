@@ -1,0 +1,6 @@
+@Article_review_system_api_HostAddress = http://localhost:5186
+
+GET {{Article_review_system_api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
