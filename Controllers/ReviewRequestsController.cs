@@ -5,77 +5,96 @@ using ArticleReviewSystem.Models;
 public class ReviewRequestsController : ControllerBase
 {
     private readonly AppDbContext _context;
-    
+
     public ReviewRequestsController(AppDbContext context)
     {
         _context = context;
     }
-    
+
     [HttpGet("new")]
     public async Task<IActionResult> GetNewReviewRequests()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        var requests = await _context.ReviewRequests
-            .Include(r => r.Article)
-            .ThenInclude(a => a.Author)
-            .Where(r => r.ReviewerId == null || r.ReviewerId == int.Parse(userId))
-            .Where(r => r.Status == "Pending")
+        var pendingArticles = await _context.Articles
+            .Where(a => a.Status == "Pending" || a.Status == "Draft")
+            .Select(a => new
+            {
+                a.Id,
+                a.Title,
+                a.Category,
+                a.SubmittedDate,
+                a.AuthorId
+            })
             .ToListAsync();
-            
-        return Ok(requests);
+
+        return Ok(pendingArticles);
     }
-    
+
+    [HttpGet("pending-articles")]
+[Authorize(Roles = "Reviewer,Admin")] 
+public async Task<IActionResult> GetPendingArticles()
+{
+    var pendingArticles = await _context.Articles
+        .Where(a => a.Status == "Pending" || a.Status == "Draft")
+        .Select(a => new 
+        {
+            a.Id,
+            a.Title,
+            a.Category,
+            a.SubmittedDate,
+            a.AuthorId 
+        })
+        .ToListAsync();
+
+    return Ok(pendingArticles);
+}    
+
     [HttpGet("inprogress")]
     public async Task<IActionResult> GetInProgressReviews()
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        
-        var requests = await _context.ReviewRequests
-            .Include(r => r.Article)
-            .ThenInclude(a => a.Author)
-            .Where(r => r.ReviewerId == int.Parse(userId))
-            .Where(r => r.Status == "Accepted")
+        var inProgressArticles = await _context.Articles
+            .Where(a => a.Status == "Accepted")
+            .Select(a => new
+            {
+                a.Id,
+                a.Title,
+                a.Category,
+                a.SubmittedDate,
+                a.AuthorId
+            })
             .ToListAsync();
-            
-        return Ok(requests);
+
+        return Ok(inProgressArticles);
     }
-    
+
     [HttpPut("{id}/accept")]
     public async Task<IActionResult> AcceptReviewRequest(int id)
     {
-        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        var request = await _context.ReviewRequests.FindAsync(id);
-        
-        if (request == null)
+        var article = await _context.Articles.FindAsync(id);
+        if (article == null)
         {
-            return NotFound();
+            return NotFound(new { error = "Article not found." });
         }
-        
-        request.ReviewerId = int.Parse(userId);
-        request.Status = "Accepted";
-        
-        _context.ReviewRequests.Update(request);
+
+        article.Status = "Accepted";
+        _context.Articles.Update(article);
         await _context.SaveChangesAsync();
-        
-        return Ok(request);
+
+        return Ok(new { message = "Article accepted for review successfully.", articleId = article.Id });
     }
-    
+
     [HttpPut("{id}/decline")]
     public async Task<IActionResult> DeclineReviewRequest(int id)
     {
-        var request = await _context.ReviewRequests.FindAsync(id);
-        
-        if (request == null)
+        var article = await _context.Articles.FindAsync(id);
+        if (article == null)
         {
-            return NotFound();
+            return NotFound(new { error = "Article not found." });
         }
-        
-        request.Status = "Declined";
-        
-        _context.ReviewRequests.Update(request);
+
+        article.Status = "Declined";
+        _context.Articles.Update(article);
         await _context.SaveChangesAsync();
-        
-        return Ok(request);
+
+        return Ok(new { message = "Article declined successfully.", articleId = article.Id });
     }
 }
