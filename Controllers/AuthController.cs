@@ -29,7 +29,6 @@ public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         FirstName = registerDto.FirstName,
         LastName = registerDto.LastName,
         Role = registerDto.Role,
-        // Optional fields
         Bio = registerDto.Bio,
         Location = registerDto.Location,
         Institution = registerDto.Institution,
@@ -68,11 +67,10 @@ public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         return Ok(new { Token = token, User = new { user.Id, user.Email, user.Role } });
     }
 
- [HttpGet("profile")]
-[Authorize]  // Requires authentication
+[HttpGet("profile")]
+[Authorize]  
 public async Task<IActionResult> GetProfile()
 {
-    // Get current user ID from claims
     var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     
     if (string.IsNullOrEmpty(userId))
@@ -80,7 +78,6 @@ public async Task<IActionResult> GetProfile()
         return Unauthorized();
     }
 
-    // Get user from database
     var user = await _userManager.FindByIdAsync(userId);
     
     if (user == null)
@@ -88,7 +85,6 @@ public async Task<IActionResult> GetProfile()
         return NotFound();
     }
 
-    // Return profile data (create a DTO to avoid sending sensitive data)
     var profileDto = new ProfileDto
     {
         FirstName = user.FirstName,
@@ -103,7 +99,42 @@ public async Task<IActionResult> GetProfile()
     };
 
     return Ok(profileDto);
-}   
+} 
+
+    [HttpPut("profile")]
+[Authorize]
+public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileDto updateDto)
+{
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+    
+    if (string.IsNullOrEmpty(userId))
+    {
+        return Unauthorized();
+    }
+
+    var user = await _userManager.FindByIdAsync(userId);
+    if (user == null)
+    {
+        return NotFound();
+    }
+
+    user.FirstName = updateDto.FirstName ?? user.FirstName;
+    user.LastName = updateDto.LastName ?? user.LastName;
+    user.Bio = updateDto.Bio ?? user.Bio;
+    user.Location = updateDto.Location ?? user.Location;
+    user.Institution = updateDto.Institution ?? user.Institution;
+    user.Specialization = updateDto.Specialization ?? user.Specialization;
+    user.SocialLinks = updateDto.SocialLinks ?? user.SocialLinks;
+
+    var result = await _userManager.UpdateAsync(user);
+    if (!result.Succeeded)
+    {
+        return BadRequest(result.Errors);
+    }
+
+    return Ok(new { Message = "Profile updated successfully" });
+}
+
     private string GenerateJwtToken(User user)
     {
         var claims = new List<Claim>
