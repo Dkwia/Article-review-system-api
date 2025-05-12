@@ -67,7 +67,43 @@ public async Task<IActionResult> Register([FromBody] RegisterDto registerDto)
         
         return Ok(new { Token = token, User = new { user.Id, user.Email, user.Role } });
     }
+
+ [HttpGet("profile")]
+[Authorize]  // Requires authentication
+public async Task<IActionResult> GetProfile()
+{
+    // Get current user ID from claims
+    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
     
+    if (string.IsNullOrEmpty(userId))
+    {
+        return Unauthorized();
+    }
+
+    // Get user from database
+    var user = await _userManager.FindByIdAsync(userId);
+    
+    if (user == null)
+    {
+        return NotFound();
+    }
+
+    // Return profile data (create a DTO to avoid sending sensitive data)
+    var profileDto = new ProfileDto
+    {
+        FirstName = user.FirstName,
+        LastName = user.LastName,
+        Email = user.Email,
+        Role = user.Role,
+        Specialization = user.Specialization,
+        Institution = user.Institution,
+        Bio = user.Bio,
+        Location = user.Location,
+        SocialLinks = user.SocialLinks
+    };
+
+    return Ok(profileDto);
+}   
     private string GenerateJwtToken(User user)
     {
         var claims = new List<Claim>
