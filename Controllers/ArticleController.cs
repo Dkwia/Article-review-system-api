@@ -72,7 +72,7 @@ public class ArticlesController : ControllerBase
             return NotFound();
         }
         
-        article.Status = "Submitted";
+        article.Status = "Pending";
         article.SubmittedDate = DateTime.UtcNow;
         
         _context.Articles.Update(article);
