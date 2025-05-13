@@ -10,6 +10,7 @@ public class Article
     public DateTime? SubmittedDate { get; set; }
     public string? FeaturedImageUrl { get; set; }
     public List<string> Tags { get; set; } = new List<string>();
+    public string FilePath { get; set; } = string.Empty; 
     
     public ICollection<ReviewRequest> ReviewRequests { get; set; } = new List<ReviewRequest>();
     public ICollection<Review> Reviews { get; set; } = new List<Review>();
