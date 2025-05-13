@@ -47,6 +47,23 @@ public class AdminController : ControllerBase
         
         return Ok(user);
     }
+
+[HttpDelete("users/{id}")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> DeleteUser(int id)
+{
+    var user = await _context.Users.FindAsync(id);
+    if (user == null)
+    {
+        return NotFound(new { error = "User not found." });
+    }
+
+    // Remove the user from the database
+    _context.Users.Remove(user);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "User deleted successfully." });
+}
     
     [HttpPut("users/{id}/block")]
     public async Task<IActionResult> BlockUser(int id)
@@ -63,12 +80,28 @@ public class AdminController : ControllerBase
         
         return Ok(user);
     }
+
+
+
+[HttpDelete("reviews/{id}")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> DeleteReview(int id)
+{
+    var review = await _context.Reviews.FindAsync(id);
+    if (review == null)
+    {
+        return NotFound(new { error = "Review not found." });
+    }
+
+    _context.Reviews.Remove(review);
+    await _context.SaveChangesAsync();
+    return Ok(new { message = "Review deleted successfully." });
+}
     
     [HttpGet("articles")]
     public async Task<IActionResult> GetArticles()
     {
         var articles = await _context.Articles
-            .Include(a => a.Author)
             .ToListAsync();
             
         return Ok(articles);
@@ -91,7 +124,50 @@ public class AdminController : ControllerBase
         
         return Ok(request);
     }
+
+[HttpGet("reviews/completed")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> GetCompletedReviews()
+{
+    var reviews = await _context.Reviews
+        .Select(r => new
+        {
+            r.Id,
+            r.ArticleId,
+            r.ReviewerId,
+            r.Rating,
+            r.Recommendation,
+            r.TechnicalMerit,
+            r.Originality,
+            r.PresentationQuality,
+            r.CommentsToAuthors,
+            r.ConfidentialComments,
+            r.Status,
+            r.CreatedAt
+        })
+        .ToListAsync();
+
+    return Ok(reviews);
 }
+
+[HttpDelete("article/{id}")]
+[Authorize(Roles = "Admin")]
+public async Task<IActionResult> DeleteArticle(int id)
+{
+    var article = await _context.Articles.FindAsync(id);
+    if (article == null)
+    {
+        return NotFound(new { error = "Article not found." });
+    }
+
+    _context.Articles.Remove(article);
+    await _context.SaveChangesAsync();
+    return Ok(new { message = "Article deleted successfully." });
+}
+
+}
+
+
 
 public class AdminCreateUserDto
 {

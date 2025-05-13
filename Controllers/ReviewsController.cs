@@ -1,7 +1,7 @@
 using ArticleReviewSystem.Models;
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Reviewer,Admin")]
+[Authorize(Roles = "Author,Reviewer,Admin")]
 public class ReviewsController : ControllerBase
 {
     private readonly AppDbContext _context;

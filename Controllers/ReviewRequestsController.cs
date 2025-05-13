@@ -67,34 +67,44 @@ public async Task<IActionResult> GetPendingArticles()
     }
 
     [HttpPut("{id}/accept")]
-    public async Task<IActionResult> AcceptReviewRequest(int id)
+public async Task<IActionResult> AcceptReviewRequest(int id)
+{
+    var article = await _context.Articles.FindAsync(id);
+    if (article == null)
     {
-        var article = await _context.Articles.FindAsync(id);
-        if (article == null)
-        {
-            return NotFound(new { error = "Article not found." });
-        }
-
-        article.Status = "Accepted";
-        _context.Articles.Update(article);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Article accepted for review successfully.", articleId = article.Id });
+        return NotFound(new { error = "Article not found." });
     }
 
-    [HttpPut("{id}/decline")]
-    public async Task<IActionResult> DeclineReviewRequest(int id)
+    if (article.Status != "Pending")
     {
-        var article = await _context.Articles.FindAsync(id);
-        if (article == null)
-        {
-            return NotFound(new { error = "Article not found." });
-        }
-
-        article.Status = "Declined";
-        _context.Articles.Update(article);
-        await _context.SaveChangesAsync();
-
-        return Ok(new { message = "Article declined successfully.", articleId = article.Id });
+        return BadRequest(new { error = "Article is no longer pending." });
     }
+
+    article.Status = "Accepted";
+    _context.Articles.Update(article);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Article accepted for review successfully.", articleId = article.Id });
+}
+
+[HttpPut("{id}/decline")]
+public async Task<IActionResult> DeclineReviewRequest(int id)
+{
+    var article = await _context.Articles.FindAsync(id);
+    if (article == null)
+    {
+        return NotFound(new { error = "Article not found." });
+    }
+
+    if (article.Status != "Pending")
+    {
+        return BadRequest(new { error = "Article is no longer pending." });
+    }
+
+    article.Status = "Rejected";
+    _context.Articles.Update(article);
+    await _context.SaveChangesAsync();
+
+    return Ok(new { message = "Article declined successfully.", articleId = article.Id });
+}
 }
