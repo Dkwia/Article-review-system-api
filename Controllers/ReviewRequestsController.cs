@@ -75,7 +75,7 @@ public async Task<IActionResult> AcceptReviewRequest(int id)
         return NotFound(new { error = "Article not found." });
     }
 
-    if (article.Status != "Pending")
+    if (article.Status != "Pending" && article.Status != "Draft")
     {
         return BadRequest(new { error = "Article is no longer pending." });
     }
@@ -96,7 +96,7 @@ public async Task<IActionResult> DeclineReviewRequest(int id)
         return NotFound(new { error = "Article not found." });
     }
 
-    if (article.Status != "Pending")
+    if (article.Status != "Pending" && article.Status != "Draft")
     {
         return BadRequest(new { error = "Article is no longer pending." });
     }

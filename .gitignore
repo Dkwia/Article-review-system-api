@@ -1,6 +1,6 @@
 bin/
 obj/
 Migrations/
-wwroot/
+wwwroot/
 
 appsettings.json
