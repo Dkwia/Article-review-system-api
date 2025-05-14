@@ -181,7 +181,7 @@ public async Task<IActionResult> GetReview(int id)
             Status = r.Status,
             CreatedAt = r.CreatedAt
         })
-        .FirstOrDefaultAsync(r => r.Id == id);
+        .FirstOrDefaultAsync(r => r.ArticleId == id);
 
     if (review == null)
     {
