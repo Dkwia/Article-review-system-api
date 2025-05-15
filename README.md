@@ -62,23 +62,23 @@ The API will be available at `http://localhost:5186`.
 1. **Environment Variables**:
    - Create a `appsettings.json` file in the root directory and add the following:
      ```appsettings.json
-     {
-  "ConnectionStrings": {
-    "DefaultConnection": "Host=localhost;Database=ArticleReviewSystem;Username=your_username;Password=your_password"
-  },
-  "JwtSettings": {
-    "SecretKey": "your_jwt_secret_key",
-    "Issuer": "https://localhost:5186",
-    "Audience": "https://localhost:5186"
-  },
-  "Logging": {
-    "LogLevel": {
-      "Default": "Information",
-      "Microsoft.AspNetCore": "Warning"
-    }
-  },
-  "AllowedHosts": "*"
-}
+      {
+        "ConnectionStrings": {
+          "DefaultConnection": "Host=localhost;Database=ArticleReviewSystem;Username=your_username;Password=your_password"
+        },
+        "JwtSettings": {
+          "SecretKey": "your_jwt_secret_key",
+          "Issuer": "https://localhost:5186",
+          "Audience": "https://localhost:5186"
+        },
+        "Logging": {
+          "LogLevel": {
+            "Default": "Information",
+            "Microsoft.AspNetCore": "Warning"
+          }
+        },
+      "AllowedHosts": "*"
+      }
      ```
    - Replace `your_username`, `your_password`, and `your_jwt_secret_key` with your PostgreSQL credentials and a secure JWT secret key.
 
