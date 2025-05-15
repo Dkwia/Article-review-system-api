@@ -58,7 +58,6 @@ public async Task<IActionResult> DeleteUser(int id)
         return NotFound(new { error = "User not found." });
     }
 
-    // Remove the user from the database
     _context.Users.Remove(user);
     await _context.SaveChangesAsync();
 
@@ -91,6 +90,13 @@ public async Task<IActionResult> DeleteReview(int id)
     if (review == null)
     {
         return NotFound(new { error = "Review not found." });
+    }
+
+    var article = await _context.Articles.FindAsync(review.ArticleId);
+    if (article != null)
+    {
+        article.Status = "Pending";
+        _context.Articles.Update(article);
     }
 
     _context.Reviews.Remove(review);
