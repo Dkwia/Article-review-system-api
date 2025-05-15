@@ -23,7 +23,6 @@ The **Article Review System API** is a backend service built using ASP.NET Core 
 Before running the API, ensure you have the following installed:
 - [.NET SDK 6 or later](https://dotnet.microsoft.com/download)
 - [PostgreSQL](https://www.postgresql.org/download/)
-- A code editor like [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio](https://visualstudio.microsoft.com/).
 
 ---
 
